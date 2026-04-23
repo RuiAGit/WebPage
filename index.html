@@ -3,27 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <title>Draggable Ball</title>
+    <link rel="stylesheet" href="https://fonts.roobert.com/roobert.css">
     <style>
+        body {
+            background-color: #0d0d0d;
+        }
         #ball {
             width: 50px;
             height: 50px;
-            background-color: red;
+            background-color: #faf0e6;
             border-radius: 50%;
             position: absolute;
             cursor: move;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            font-family: 'Roobert', sans-serif;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <div id="ball"></div>
+    <div id="ball">0</div>
+    <div id="message">Hi</div>
     <script>
         const ball = document.getElementById('ball');
+        ball.textContent = '0';
         let isDragging = false;
         let offsetX, offsetY;
         let velocityY = 0;
         const gravity = 0.5;
         const bounce = 0.8;
         const ground = window.innerHeight - 50;
+        let bounceCount = 0;
+        let wasInAirLastFrame = true;
 
         function animate() {
             if (!isDragging) {
@@ -31,10 +55,20 @@
                 let top = ball.offsetTop + velocityY;
                 if (top >= ground) {
                     top = ground;
-                    velocityY *= -bounce;
-                    if (Math.abs(velocityY) < 1) velocityY = 0;
+                    if (velocityY > 0) {
+                        velocityY *= -bounce;
+                        if (wasInAirLastFrame) {
+                            bounceCount++;
+                            ball.textContent = bounceCount.toString();
+                            if (bounceCount >= 100) {
+                                document.getElementById('message').textContent = 'M';
+                            }
+                        }
+                        if (Math.abs(velocityY) < 0.5) velocityY = 0;
+                    }
                 }
                 ball.style.top = top + 'px';
+                wasInAirLastFrame = (top < ground);
             }
             requestAnimationFrame(animate);
         }
