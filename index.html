@@ -39,23 +39,51 @@
             requestAnimationFrame(animate);
         }
 
-        ball.addEventListener('mousedown', (e) => {
+        function startDrag(clientX, clientY) {
             isDragging = true;
             velocityY = 0;
-            offsetX = e.clientX - ball.offsetLeft;
-            offsetY = e.clientY - ball.offsetTop;
+            offsetX = clientX - ball.offsetLeft;
+            offsetY = clientY - ball.offsetTop;
+        }
+
+        function moveDrag(clientX, clientY) {
+            if (isDragging) {
+                ball.style.left = clientX - offsetX + 'px';
+                ball.style.top = clientY - offsetY + 'px';
+            }
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        // Mouse events
+        ball.addEventListener('mousedown', (e) => {
+            startDrag(e.clientX, e.clientY);
         });
 
         document.addEventListener('mousemove', (e) => {
+            moveDrag(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('mouseup', endDrag);
+
+        // Touch events
+        ball.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            startDrag(touch.clientX, touch.clientY);
+        });
+
+        document.addEventListener('touchmove', (e) => {
             if (isDragging) {
-                ball.style.left = e.clientX - offsetX + 'px';
-                ball.style.top = e.clientY - offsetY + 'px';
+                e.preventDefault();
+                const touch = e.touches[0];
+                moveDrag(touch.clientX, touch.clientY);
             }
         });
 
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+        document.addEventListener('touchend', endDrag);
 
         animate();
     </script>
